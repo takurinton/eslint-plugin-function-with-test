@@ -1,0 +1,44 @@
+{
+  "devDependencies": {
+    "@types/eslint": "^8.44.2",
+    "@types/node": "^20.5.9",
+    "@types/react": "18.2.21",
+    "@types/styled-components": "^5.1.26",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "@typescript-eslint/rule-tester": "^6.6.0",
+    "eslint": "^8.48.0",
+    "eslint-plugin-local-rules": "^2.0.0",
+    "prettier": "3.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "5.1.6",
+    "vitest": "^0.34.3"
+  },
+  "dependencies": {
+    "@typescript-eslint/experimental-utils": "4.15.0"
+  },
+  "name": "@takurinton/eslint-plugin-function-with-test",
+  "version": "0.0.8",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "!dist/__tests__",
+    "!dist/playground"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/takurinton/eslint-plugin-function-with-test.git"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "lint": "eslint 'src/playground'",
+    "debug": "yarn build && yarn lint",
+    "runtime": "ts-node ./src/playground/runtime.ts",
+    "validate": "ts-node ./src/playground/validation.ts",
+    "test": "vitest",
+    "public": "npm publish --access=public"
+  },
+  "author": "takurinton",
+  "license": "MIT",
+  "description": ""
+}

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "es2020",
+    "module": "Node16",
+    "outDir": "./dist",
+    "strict": true,
+    "lib": ["es6", "dom", "ESNext"],
+    "moduleResolution": "Node16",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["playground", "node_modules"]
+}
