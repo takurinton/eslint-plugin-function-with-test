@@ -1,13 +1,13 @@
 import { TSESLint } from "@typescript-eslint/experimental-utils";
 import { Errors } from "./types";
 import { messages } from "./messages";
-import fs from "fs";
-
-/**
- * プロジェクトの全てのテストファイルの名前を取得する
- */
-const getTestFileNames = () =>
-  fs.readdirSync(".").filter((fileName) => fileName.match(/\.test\.ts$/));
+import {
+  getFilePath,
+  getImportDeclarationFromFilePath,
+  getRelativePath,
+  getTestFileNames,
+  isNodeModulesImport,
+} from "./utils";
 
 /**
  * @description export されている全ての関数にテストを必ず書くようにするためのルール
@@ -31,16 +31,26 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
     messages,
   },
   create(context) {
+    const testFileNames = getTestFileNames(process.cwd());
+
     return {
       ExportNamedDeclaration(node) {
+        const filename = context.getFilename();
         const { specifiers } = node;
-        // export { foo, bar } の形式
+
+        // export { foo, bar } の形式での export がされてるときに specifiers から
+        // export と import を取得し、マッチしていたらそれはテストが書かれているものと
+        // して扱う
         if (specifiers.length > 0) {
           for (const specifier of specifiers) {
+            // 関数名を取得
             const exportedName = specifier.exported.name;
+            // 関数名に一致する variable を取得
             const variable = context
               .getScope()
               .variables.find((v) => v.name === exportedName);
+
+            let isImported = false;
 
             if (variable) {
               for (const def of variable.defs) {
@@ -55,9 +65,68 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
                   (def.type === "Variable" &&
                     def.node.init?.type === "ArrowFunctionExpression")
                 ) {
-                  // TODO: 実装
-                  // console.log(`${exportedName} is a function`);
+                  const functionName = exportedName;
+                  for (const testFileName of testFileNames!) {
+                    const importDeclarations =
+                      getImportDeclarationFromFilePath(testFileName);
+
+                    // 今の node の関数（functionName）が import されているかどうかを確認する
+                    // import されているかどうかの基準は
+                    // - import されているファイルのパスが一致しているかどうか
+                    // - import している関数名が一致しているかどうか
+                    for (const importDeclaration of importDeclarations) {
+                      if (importDeclaration.type !== "ImportDeclaration") {
+                        return;
+                      }
+
+                      const { source, specifiers } = importDeclaration;
+                      if (isNodeModulesImport(source.value)) {
+                        continue;
+                      }
+
+                      const relativePath = getRelativePath(
+                        testFileName,
+                        filename
+                      );
+
+                      // テストファイルのパスから、import しているファイルのパスを取得する
+                      // ./foo/bar/index.ts => ./foo/bar に変換している
+                      const filePath = getFilePath(relativePath);
+
+                      // import する値を取得
+                      // MEMO: source.value と source.raw の違い調べる
+                      const { value } = source;
+
+                      // path が違ったら return
+                      if (value !== filePath) {
+                        continue;
+                      }
+
+                      // import をしているファイルの中に、今の node の関数が import されているかどうかを確認する
+                      for (const specifier of specifiers) {
+                        if (specifier.type !== "ImportSpecifier") {
+                          return;
+                        }
+
+                        const { imported } = specifier;
+
+                        // 関数名が同じだったら、import されているということなので、isImported を true にする
+                        // 複数ファイルに分散してる可能性や、同じファイル内で import されている可能性もあるので、return はしない
+                        if (imported.name === functionName) {
+                          isImported = true;
+                        }
+                      }
+                    }
+                  }
                 }
+              }
+
+              // 全てのテストファイルを見て、import されていなかったらエラーを出す
+              if (!isImported) {
+                context.report({
+                  node,
+                  messageId: "test_required",
+                });
               }
             }
           }
@@ -66,7 +135,7 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
         const { declaration } = node;
         // function 宣言
         if (declaration?.type === "FunctionDeclaration") {
-          // console.log(declaration);
+          // console.log(declaration?.id?.name);
         }
 
         // arrow function
@@ -77,7 +146,7 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
             "ArrowFunctionExpression" &&
           declaration.declarations[0].id.type === "Identifier"
         ) {
-          console.log(declaration.declarations[0].id.name);
+          // console.log(declaration.declarations[0].id.name);
         }
       },
       // ExportDefaultDeclaration(node) {}

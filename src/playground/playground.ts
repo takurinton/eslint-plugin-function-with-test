@@ -23,5 +23,5 @@ function exportObjectNamedFunction() {
   return "hoge";
 }
 
-// export する
+// export する関数にテストは必要
 export { exportObjectArrowFunction, exportObjectNamedFunction };
