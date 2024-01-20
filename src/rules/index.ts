@@ -1,4 +1,4 @@
-import { TSESLint } from "@typescript-eslint/experimental-utils";
+import { TSESLint } from "@typescript-eslint/utils";
 import { Errors } from "./types";
 import { messages } from "./messages";
 import {
@@ -7,6 +7,7 @@ import {
   getRelativePath,
   getTestFileNames,
   isNodeModulesImport,
+  isSameFilePath,
 } from "./utils";
 
 /**
@@ -14,7 +15,6 @@ import {
  *
  * @memo テストが書かれているかどうかの確認方法は、.test.ts という拡張子の中で FunctionDeclaration の名前と一致するものがあるかどうかで判断する
  *
- * @todo テストが書いてなかったらエラーを出す
  * @todo test-ignore コメントがあったら無視する
  */
 export const requireTest: TSESLint.RuleModule<Errors, []> = {
@@ -22,20 +22,20 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
     type: "suggestion",
     docs: {
       description: "関数にテストを必ず書いてください",
-      category: "Best Practices",
-      recommended: "error",
+      recommended: "recommended",
       url: "",
     },
-    fixable: "code",
     schema: [],
     messages,
   },
+  defaultOptions: [],
   create(context) {
-    const testFileNames = getTestFileNames(process.cwd());
+    const { cwd } = context;
+    const testFileNames = getTestFileNames(cwd);
 
     return {
       ExportNamedDeclaration(node) {
-        const filename = context.getFilename();
+        const { filename } = context;
         const { specifiers } = node;
 
         // export { foo, bar } の形式での export がされてるときに specifiers から
@@ -45,9 +45,10 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
           for (const specifier of specifiers) {
             // 関数名を取得
             const exportedName = specifier.exported.name;
+            const node = specifier.exported;
             // 関数名に一致する variable を取得
-            const variable = context
-              .getScope()
+            const variable = context.sourceCode
+              .getScope?.(node)
               .variables.find((v) => v.name === exportedName);
 
             let isImported = false;
@@ -97,8 +98,10 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
                       // MEMO: source.value と source.raw の違い調べる
                       const { value } = source;
 
+                      const samePath = isSameFilePath(value, filePath);
+
                       // path が違ったら return
-                      if (value !== filePath) {
+                      if (!samePath) {
                         continue;
                       }
 
@@ -166,8 +169,9 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
               // MEMO: source.value と source.raw の違い調べる
               const { value } = source;
 
+              const samePath = isSameFilePath(value, filePath);
               // path が違ったら return
-              if (value !== filePath) {
+              if (!samePath) {
                 continue;
               }
 
@@ -222,7 +226,7 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
 
               const { source, specifiers } = importDeclaration;
               if (isNodeModulesImport(source.value)) {
-                continue;
+                return;
               }
 
               const relativePath = getRelativePath(testFileName, filename);
@@ -235,9 +239,11 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
               // MEMO: source.value と source.raw の違い調べる
               const { value } = source;
 
+              const samePath = isSameFilePath(value, filePath);
+
               // path が違ったら return
-              if (value !== filePath) {
-                continue;
+              if (!samePath) {
+                return;
               }
 
               // import をしているファイルの中に、今の node の関数が import されているかどうかを確認する

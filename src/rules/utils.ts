@@ -45,6 +45,29 @@ export const getFilePath = (relativePath: string): string => {
 };
 
 /**
+ *
+ * @param a
+ * @param b
+ * @returns boolean
+ *
+ * file path が同義がどうかを判定する
+ */
+export const isSameFilePath = (a: string, b: string): boolean => {
+  // ./foo/bar/index => ./foo/bar に変換している
+  const importPathA = a.endsWith("index") ? a.replace("index", "") : a;
+  const importPathB = b.endsWith("index") ? b.replace("index", "") : b;
+
+  switch (true) {
+    case importPathA === importPathB: // 同じパス
+    case importPathA === `${importPathB}/`: // ./ と . や ../ と .. が同じという扱いにする
+    case `${importPathA}/` === importPathB: // ./ と . や ../ と .. が同じという扱いにする
+      return true;
+    default:
+      return false;
+  }
+};
+
+/**
  * @param value
  *
  * node_modules から import されているかどうかを判定する

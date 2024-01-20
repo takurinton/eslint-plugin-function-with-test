@@ -4,6 +4,7 @@ import {
   getFilePath,
   // getTestFileNames,
   isNodeModulesImport,
+  isSameFilePath,
 } from "../rules/utils";
 
 describe("utils", () => {
@@ -41,6 +42,23 @@ describe("utils", () => {
       expect(isNodeModulesImport("./a")).toBe(false);
       expect(isNodeModulesImport("./a/b")).toBe(false);
       expect(isNodeModulesImport("./a/b/c")).toBe(false);
+    });
+  });
+
+  describe("isSameFilePath", () => {
+    test("should return true", () => {
+      expect(isSameFilePath("./", ".")).toBe(true);
+      expect(isSameFilePath("..", "../")).toBe(true);
+      expect(isSameFilePath("./a/b/c", "./a/b/c")).toBe(true);
+      expect(isSameFilePath("./a/b/c", "./a/b/c/")).toBe(true);
+      expect(isSameFilePath("./a/b/c/", "./a/b/c")).toBe(true);
+      expect(isSameFilePath("./a/b/c/", "./a/b/c/")).toBe(true);
+      expect(isSameFilePath("./a/b/c/index", "./a/b/c/")).toBe(true);
+      expect(isSameFilePath("./a/b/c/", "./a/b/c/index")).toBe(true);
+      expect(isSameFilePath("./a/b/c", "./a/b/d")).toBe(false);
+      expect(isSameFilePath("./a/b/c", "./a/b/d/")).toBe(false);
+      expect(isSameFilePath("./a/b/c/", "./a/b/d")).toBe(false);
+      expect(isSameFilePath("./a/b/c/", "./a/b/d/")).toBe(false);
     });
   });
 });
