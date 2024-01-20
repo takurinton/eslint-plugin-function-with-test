@@ -37,11 +37,6 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
         if (specifiers.length > 0) {
           for (const specifier of specifiers) {
             const node = specifier.exported;
-            const comments = context.sourceCode.getCommentsBefore(node);
-            const ignore = isIgnoreTest(comments);
-            if (ignore) {
-              return;
-            }
 
             // 関数名を取得
             const exportedName = specifier.exported.name;
@@ -55,6 +50,12 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
 
             if (variable) {
               for (const def of variable.defs) {
+                const comments = context.sourceCode.getCommentsBefore(def.node);
+
+                if (isIgnoreTest(comments)) {
+                  return;
+                }
+
                 /**
                  * export されてる関数を取得
                  * function foo() {} の形式は FunctionName で取得可能
