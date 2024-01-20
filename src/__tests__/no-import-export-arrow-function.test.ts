@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getTester } from "../testRunner";
 
-const tester = getTester("__tests__/fixtures/no-import-arrow-export-function");
+const tester = getTester("__tests__/fixtures/no-import-export-arrow-function");
 
 describe("function-with-test", () => {
   it("should 1 error", async () => {
