@@ -1,7 +1,7 @@
 import { TSESLint } from "@typescript-eslint/utils";
 import { Errors } from "./types";
 import { messages } from "./messages";
-import { getIsImported, getTestFileNames } from "./utils";
+import { getIsImported, getTestFileNames, isIgnoreTest } from "./utils";
 
 /**
  * @description export されている全ての関数にテストを必ず書くようにするためのルール
@@ -36,9 +36,16 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
         // して扱う
         if (specifiers.length > 0) {
           for (const specifier of specifiers) {
+            const node = specifier.exported;
+            const comments = context.sourceCode.getCommentsBefore(node);
+            const ignore = isIgnoreTest(comments);
+            if (ignore) {
+              return;
+            }
+
             // 関数名を取得
             const exportedName = specifier.exported.name;
-            const node = specifier.exported;
+
             // 関数名に一致する variable を取得
             const variable = context.sourceCode
               .getScope?.(node)
@@ -81,6 +88,12 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
         const { declaration } = node;
         // function 宣言
         if (declaration?.type === "FunctionDeclaration") {
+          const comments = context.sourceCode.getCommentsBefore(node);
+          const ignore = isIgnoreTest(comments);
+          if (ignore) {
+            return;
+          }
+
           const functionName = declaration?.id?.name;
 
           const isImported = getIsImported(
@@ -105,6 +118,12 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
             "ArrowFunctionExpression" &&
           declaration.declarations[0].id.type === "Identifier"
         ) {
+          const comments = context.sourceCode.getCommentsBefore(node);
+          const ignore = isIgnoreTest(comments);
+          if (ignore) {
+            return;
+          }
+
           const functionName = declaration.declarations[0].id.name;
 
           const isImported = getIsImported(
