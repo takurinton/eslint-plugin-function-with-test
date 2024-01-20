@@ -119,3 +119,73 @@ export const getTestFileNames = (path: string) => {
 
   return testFileNames;
 };
+
+/**
+ *
+ * @param functionName
+ * @param testFileNames
+ * @param filename
+ * @returns
+ *
+ * 関数が import されているかどうかを判定する
+ * @todo テスト書く
+ */
+export const getIsImported = (
+  functionName: string,
+  testFileNames: string[],
+  filename: string
+): boolean => {
+  let isImported = false;
+
+  for (const testFileName of testFileNames!) {
+    const importDeclarations = getImportDeclarationFromFilePath(testFileName);
+
+    // 今の node の関数（functionName）が import されているかどうかを確認する
+    // import されているかどうかの基準は
+    // - import されているファイルのパスが一致しているかどうか
+    // - import している関数名が一致しているかどうか
+    for (const importDeclaration of importDeclarations) {
+      if (importDeclaration.type !== "ImportDeclaration") {
+        return false;
+      }
+
+      const { source, specifiers } = importDeclaration;
+      if (isNodeModulesImport(source.value)) {
+        continue;
+      }
+
+      const relativePath = getRelativePath(testFileName, filename);
+
+      // テストファイルのパスから、import しているファイルのパスを取得する
+      // ./foo/bar/index.ts => ./foo/bar に変換している
+      const filePath = getFilePath(relativePath);
+
+      // import する値を取得
+      // MEMO: source.value と source.raw の違い調べる
+      const { value } = source;
+
+      const samePath = isSameFilePath(value, filePath);
+      // path が違ったら return
+      if (!samePath) {
+        continue;
+      }
+
+      // import をしているファイルの中に、今の node の関数が import されているかどうかを確認する
+      for (const specifier of specifiers) {
+        if (specifier.type !== "ImportSpecifier") {
+          return false;
+        }
+
+        const { imported } = specifier;
+
+        // 関数名が同じだったら、import されているということなので、isImported を true にする
+        // 複数ファイルに分散してる可能性や、同じファイル内で import されている可能性もあるので、return はしない
+        if (imported.name === functionName) {
+          isImported = true;
+        }
+      }
+    }
+  }
+
+  return isImported;
+};
