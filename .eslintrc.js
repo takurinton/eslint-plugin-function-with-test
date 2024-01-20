@@ -10,13 +10,12 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["local-rules", "@typescript-eslint"],
+  plugins: ["@typescript-eslint"],
   rules: {
     semi: ["error", "always"],
     "no-extra-semi": "error",
     quotes: ["error", "double"],
     "space-before-blocks": ["error", { functions: "always" }],
     "no-undef": ["off"],
-    "local-rules/require-test": "error",
   },
 };

@@ -2,15 +2,11 @@
   "devDependencies": {
     "@types/eslint": "^8.44.2",
     "@types/node": "^20.5.9",
-    "@types/react": "18.2.21",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/types": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
-    "@typescript-eslint/rule-tester": "^6.19.0",
     "eslint": "^8.56.0",
-    "eslint-plugin-local-rules": "^2.0.0",
     "prettier": "3.0.3",
-    "ts-node": "^10.9.1",
     "typescript": "5.1.6",
     "vitest": "^0.34.3"
   },
@@ -28,8 +24,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "lint": "eslint 'src/playground'",
-    "debug": "yarn build && yarn lint",
+    "lint": "eslint --ext .ts,.tsx .",
     "test": "vitest"
   },
   "author": "takurinton",
