@@ -128,7 +128,7 @@ export const getTestFileNames = (path: string) => {
  * @returns
  *
  * 関数が import されているかどうかを判定する
- * @todo テスト書く
+ * @memo テスト書くの難しいので、各ユニットテストと rule tester で挙動は担保する
  */
 export const getIsImported = (
   functionName: string,

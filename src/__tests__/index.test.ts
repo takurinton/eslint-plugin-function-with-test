@@ -5,6 +5,7 @@ import {
   // getTestFileNames,
   isNodeModulesImport,
   isSameFilePath,
+  // getIsImported,
 } from "../rules/utils";
 
 describe("utils", () => {
@@ -61,4 +62,7 @@ describe("utils", () => {
       expect(isSameFilePath("./a/b/c/", "./a/b/d/")).toBe(false);
     });
   });
+
+  // describe("getIsImported", () => {
+  // });
 });
