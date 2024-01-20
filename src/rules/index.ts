@@ -59,9 +59,8 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
                   (def.type === "Variable" &&
                     def.node.init?.type === "ArrowFunctionExpression")
                 ) {
-                  const functionName = exportedName;
                   isImported = getIsImported(
-                    functionName,
+                    exportedName,
                     testFileNames!,
                     filename
                   );
