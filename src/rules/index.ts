@@ -226,7 +226,7 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
 
               const { source, specifiers } = importDeclaration;
               if (isNodeModulesImport(source.value)) {
-                return;
+                continue;
               }
 
               const relativePath = getRelativePath(testFileName, filename);
@@ -240,10 +240,9 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
               const { value } = source;
 
               const samePath = isSameFilePath(value, filePath);
-
               // path が違ったら return
               if (!samePath) {
-                return;
+                continue;
               }
 
               // import をしているファイルの中に、今の node の関数が import されているかどうかを確認する

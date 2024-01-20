@@ -48,6 +48,8 @@ class Tester {
   }
 }
 
-export const getTester = () => {
-  return new Tester(path.resolve(__dirname, "__tests__/fixtures"));
+export const getTester = (rootPath?: string) => {
+  const root = path.resolve(__dirname, rootPath ?? "__tests__/fixtures");
+  console.log(root);
+  return new Tester(root);
 };
