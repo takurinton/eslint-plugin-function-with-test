@@ -189,3 +189,11 @@ export const getIsImported = (
 
   return isImported;
 };
+
+/**
+ * @param comments
+ *
+ * コメントに test-ignore が含まれているかどうかを判定する
+ */
+export const isIgnoreTest = (comments: TSESTree.Comment[]): boolean =>
+  comments.some((comment) => comment.value.includes("test-ignore"));
