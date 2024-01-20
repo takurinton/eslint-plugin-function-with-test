@@ -33,6 +33,8 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
     const { cwd } = context;
     const testFileNames = getTestFileNames(cwd);
 
+    console.log(testFileNames);
+
     return {
       ExportNamedDeclaration(node) {
         const { filename } = context;
