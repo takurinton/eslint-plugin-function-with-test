@@ -14,7 +14,9 @@ export function exportNamedFunction() {
  */
 const exportObjectArrowFunction = () => "bar";
 
-// not comment
+/**
+ * test-ignore
+ */
 function exportObjectNamedFunction() {
   return "hoge";
 }
