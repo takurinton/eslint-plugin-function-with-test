@@ -1,7 +1,12 @@
 import { TSESLint } from "@typescript-eslint/utils";
 import { Errors } from "./types";
 import { messages } from "./messages";
-import { getIsImported, getTestFileNames, isIgnoreTest } from "./utils";
+import {
+  getIsImported,
+  getIsImportedDefault,
+  getTestFileNames,
+  isIgnoreTest,
+} from "./utils";
 
 /**
  * @description export されている全ての関数にテストを必ず書くようにするためのルール
@@ -149,7 +154,28 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
        * - function foo() {} export default foo; の形式で export されている関数
        * - const foo = () => {}; export default foo; の形式で export されている関数
        */
-      ExportDefaultDeclaration(node) {},
+      ExportDefaultDeclaration(node) {
+        const { filename } = context;
+        const { declaration } = node;
+
+        // function 宣言
+        if (declaration?.type === "FunctionDeclaration") {
+          const comments = context.sourceCode.getCommentsBefore(node);
+          const ignore = isIgnoreTest(comments);
+          if (ignore) {
+            return;
+          }
+
+          const isImported = getIsImportedDefault(testFileNames!, filename);
+
+          if (!isImported) {
+            context.report({
+              node,
+              messageId: "test_required",
+            });
+          }
+        }
+      },
 
       /**
        * export * from "foo"; の形式は一旦サポートしない
