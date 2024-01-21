@@ -141,8 +141,22 @@ export const requireTest: TSESLint.RuleModule<Errors, []> = {
           }
         }
       },
-      // ExportDefaultDeclaration(node) {}
-      // ExportAllDeclaration(node) {}
+
+      /**
+       * 以下の形式をサポート
+       * - export default function foo() {} の形式で export されている関数
+       * - export default () => {} の形式で export されている関数
+       * - function foo() {} export default foo; の形式で export されている関数
+       * - const foo = () => {}; export default foo; の形式で export されている関数
+       */
+      ExportDefaultDeclaration(node) {},
+
+      /**
+       * export * from "foo"; の形式は一旦サポートしない
+       */
+      ExportAllDeclaration() {
+        // NOOP
+      },
     };
   },
 };
