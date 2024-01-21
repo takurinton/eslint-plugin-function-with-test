@@ -23,3 +23,8 @@ function exportObjectNamedFunction() {
 
 // export する関数にテストは必要
 export { exportObjectArrowFunction, exportObjectNamedFunction };
+
+// test-ignore
+export default function () {
+  return "default";
+}
