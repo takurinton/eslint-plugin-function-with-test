@@ -1,3 +1,5 @@
-export default function () {
-  return "hoge";
+function foo() {
+  return "foo";
 }
+
+export default foo;
