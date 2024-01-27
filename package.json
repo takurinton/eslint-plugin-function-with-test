@@ -1,22 +1,22 @@
 {
   "devDependencies": {
-    "@types/eslint": "^8.44.2",
-    "@types/node": "^20.5.9",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/types": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "eslint": "^8.56.0",
+    "@types/eslint": "8.44.2",
+    "@types/node": "20.5.9",
+    "@typescript-eslint/eslint-plugin": "6.19.0",
+    "@typescript-eslint/types": "6.19.0",
+    "@typescript-eslint/parser": "6.19.0",
+    "eslint": "8.56.0",
     "prettier": "3.0.3",
     "typescript": "5.1.6",
-    "vitest": "^0.34.3"
+    "vitest": "0.34.3"
   },
   "name": "@takurinton/eslint-plugin-function-with-test",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "files": [
     "dist",
     "!dist/__tests__",
-    "!dist/playground"
+    "!dist/testRunner.js"
   ],
   "repository": {
     "type": "git",
