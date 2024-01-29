@@ -1,4 +1,4 @@
-import { parse } from "@typescript-eslint/parser";
+import { parse } from "@typescript-eslint/typescript-estree";
 import type { TSESTree } from "@typescript-eslint/types";
 import fs from "fs";
 import path from "path";
